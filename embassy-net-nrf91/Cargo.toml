@@ -12,6 +12,8 @@ documentation = "https://docs.embassy.dev/embassy-net-nrf91"
 [features]
 defmt = [ "dep:defmt", "heapless/defmt-03" ]
 log = [ "dep:log" ]
+nrf9151 = []
+nrf916x = []
 
 [dependencies]
 defmt = { version = "0.3", optional = true }

@@ -169,8 +169,8 @@ async fn new_internal<'a>(
     cb.data_list_ptr = &mut cb.lists[1];
     cb.modem_info_ptr = &mut cb.modem_info;
     cb.trace_ptr = &mut cb.trace;
-    cb.lists[0].len = LIST_LEN;
-    cb.lists[1].len = LIST_LEN;
+    cb.lists[0].len = RX_LIST_LEN_CONTROL;
+    cb.lists[1].len = RX_LIST_LEN_DATA;
     cb.trace.base = trace.as_mut_ptr() as _;
     cb.trace.size = TRACE_SIZE;
 
@@ -346,8 +346,8 @@ impl StateInner {
                 self.rx_data_list = desc.data_list_ptr;
                 let rx_control_len = unsafe { addr_of!((*self.rx_control_list).len).read_volatile() };
                 let rx_data_len = unsafe { addr_of!((*self.rx_data_list).len).read_volatile() };
-                assert_eq!(rx_control_len, LIST_LEN);
-                assert_eq!(rx_data_len, LIST_LEN);
+                assert_eq!(rx_control_len, RX_LIST_LEN_CONTROL);
+                assert_eq!(rx_data_len, RX_LIST_LEN_DATA);
                 self.init = true;
 
                 debug!("IPC initialized OK!");
@@ -947,7 +947,19 @@ impl<'a> Runner<'a> {
     }
 }
 
+#[cfg(feature = "nrf9151")]
+const LIST_LEN: usize = 32;
+#[cfg(feature = "nrf9151")]
+const RX_LIST_LEN_DATA: usize = 32;
+#[cfg(feature = "nrf9151")]
+const RX_LIST_LEN_CONTROL: usize = 16;
+
+#[cfg(feature = "nrf916x")]
 const LIST_LEN: usize = 16;
+#[cfg(feature = "nrf916x")]
+const RX_LIST_LEN_DATA: usize = 16;
+#[cfg(feature = "nrf916x")]
+const RX_LIST_LEN_CONTROL: usize = 16;
 
 #[repr(C)]
 struct ControlBlock {
